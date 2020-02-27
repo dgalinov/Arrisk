@@ -9,7 +9,10 @@ public class Home : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
     public void Logout() {
-        Debug.Log("Logout from: "+SceneManager.GetActiveScene());
-        // Application.Quit();
+        // Display form
+    }
+    public void Quit() {
+        Debug.Log("Game exit succesfully");
+        Application.Quit();
     }
 }
