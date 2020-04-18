@@ -13,6 +13,7 @@ public class Enemy_behavior : MonoBehaviour
 
     #region Public Variables
     public Transform rayCast;
+    public Transform rayCast2;
     public LayerMask raycastMask;
     public float rayCastLength;
     public float attackDistance; //Minimum distance for attack
@@ -22,11 +23,13 @@ public class Enemy_behavior : MonoBehaviour
 
     #region Private Variables
     private RaycastHit2D hit;
+    private RaycastHit2D hit2;
     private GameObject target;
     private Animator anim;
     private float distance; //Store the distance b/w enemy and player
     private bool attackMode;
     private bool inRange; //Check if Player is in range
+    private bool inRangeRight;
     private bool cooling; //Check if Enemy is cooling after attack
     private float intTimer;
     #endregion
@@ -43,6 +46,9 @@ public class Enemy_behavior : MonoBehaviour
         {
             hit = Physics2D.Raycast(rayCast.position, Vector2.left, rayCastLength, raycastMask);
             RaycastDebugger();
+        } else if (inRangeRight) {
+            hit2 = Physics2D.Raycast(rayCast2.position, Vector2.right, rayCastLength, raycastMask);
+            RaycastDebuggerRight();
         }
 
         //When Player is detected
@@ -60,6 +66,21 @@ public class Enemy_behavior : MonoBehaviour
             anim.SetBool("canRun", false);
             StopAttack();
         }
+        //When Player is detected
+        if (hit2.collider != null)
+        {
+            EnemyLogic();
+        }
+        else if (hit2.collider == null)
+        {
+            inRangeRight = false;
+        }
+
+        if (inRangeRight == false)
+        {
+            anim.SetBool("canRun", false);
+            StopAttack();
+        }
     }
 
     void OnTriggerEnter2D(Collider2D trig)
@@ -68,6 +89,7 @@ public class Enemy_behavior : MonoBehaviour
         {
             target = trig.gameObject;
             inRange = true;
+            inRangeRight = true;
         }
     }
 
@@ -100,6 +122,11 @@ public class Enemy_behavior : MonoBehaviour
         {
             Vector2 targetPosition = new Vector2(target.transform.position.x, transform.position.y);
             transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            if (targetPosition.x > transform.position.x) {
+                transform.Rotate(0,180,0);
+            } else {
+                transform.Rotate(0,180,0);
+            }
         }
     }
 
@@ -139,6 +166,18 @@ public class Enemy_behavior : MonoBehaviour
         else if (attackDistance > distance)
         {
             Debug.DrawRay(rayCast.position, Vector2.left * rayCastLength, Color.green);
+        }
+    }
+
+    void RaycastDebuggerRight()
+    {
+        if (distance > attackDistance)
+        {
+            Debug.DrawRay(rayCast2.position, Vector2.left * rayCastLength, Color.red);
+        }
+        else if (attackDistance > distance)
+        {
+            Debug.DrawRay(rayCast2.position, Vector2.left * rayCastLength, Color.green);
         }
     }
 
